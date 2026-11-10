@@ -513,11 +513,13 @@
     </div>
 
     <form id="registration-form" novalidate>
-      <!-- Anti-spam honeypot -->
       <input type="text" name="_gotcha" tabindex="-1" aria-hidden="true" style="display:none" autocomplete="off" />
-      <input type="hidden" name="_subject" value="Novo cadastro – Stimulus Clínica" />
+      <input type="hidden" name="_subject" value="Novo cadastro – Stimulus Clínica × Agende.ee" />
       <input type="hidden" name="_captcha" value="false" />
       <input type="hidden" name="_template" value="table" />
+      <!-- Envia cópia para o e-mail preenchido no campo email e mensagem de confirmação -->
+      <input type="hidden" id="form-cc" name="_cc" value="" />
+      <input type="hidden" name="_autoresponse" value="Olá! Recebemos seu cadastro de profissional para a Stimulus Clínica Multidisciplinar na plataforma Agende.ee. Em breve seus serviços estarão disponíveis para agendamento online. Qualquer dúvida, responda a este e-mail." />
 
       <!-- ── Dados Pessoais ──────────────────────────────────── -->
       <section class="section-card" aria-labelledby="sec-personal">
@@ -760,6 +762,11 @@
       }
 
       sync();
+
+      // Enviar cópia também para o e-mail informado no cadastro
+      const emailVal = (document.getElementById('email').value || '').trim();
+      document.getElementById('form-cc').value = emailVal;
+
       submitBtn.disabled = true;
       submitBtn.textContent = 'Enviando…';
       statusEl.className = '';
@@ -775,7 +782,10 @@
 
         if (r.ok && json.success === 'true') {
           statusEl.className = 'success';
-          statusEl.textContent = '✅ Cadastro enviado com sucesso! Em breve entraremos em contato.';
+          statusEl.innerHTML = `
+            <strong>✅ Cadastro enviado com sucesso!</strong><br>
+            Uma cópia de confirmação foi enviada para <u>${emailVal || 'seu e-mail'}</u> e para a equipe da clínica.
+          `;
           form.reset();
           servicesList.innerHTML = '';
           addCard();
